@@ -348,4 +348,231 @@ class LaravelAnalytics
 
         return [$startDate, $endDate];
     }
+    
+     /**
+     * Get the bounce rate.
+     *
+     * @param int    $numberOfDays
+     * @param string $groupBy      Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+
+
+    public function getBounceRate($numberOfDays = 365, $groupBy = 'date')
+    {
+        list($startDate, $endDate) = $this->calculateNumberOfDays($numberOfDays);
+
+        return $this->getBounceRateForPeriod($startDate, $endDate, $groupBy);
+    }
+
+
+    /**
+     * Get the amount of visitors and pageviews for the given period.
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string   $groupBy   Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+
+
+    public function getBounceRateForPeriod(DateTime $startDate, DateTime $endDate, $groupBy = 'date')
+    {
+        $BounceData = [];
+        $answer = $this->performQuery($startDate, $endDate, 'ga:bounceRate', ['dimensions' => 'ga:'.$groupBy]);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
+
+        foreach ($answer->rows as $dateRow) {
+            $BounceData[] = [$groupBy => Carbon::createFromFormat(($groupBy == 'yearMonth' ? 'Ym' : 'Ymd'), $dateRow[0]), 'BounceRate' => $dateRow[1]];
+        }
+
+        return new Collection($BounceData);
+    }
+
+    /**
+     * Get the past visitors location.
+     *
+     * @param int    $numberOfDays
+     * @param string $groupBy      Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getCountry($numberOfDays = 365, $groupBy = 'date')
+    {
+      list($startDate, $endDate) = $this->calculateNumberOfDays($numberOfDays);
+
+      return $this->getCountryForPeriod($startDate, $endDate, $groupBy);
+    }
+
+
+    /**
+     * Get the country session for the given period.
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string   $groupBy   Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getCountryForPeriod(DateTime $startDate, DateTime $endDate, $groupBy = 'date')
+    {
+        $CountryData = [];
+        $answer = $this->performQuery($startDate, $endDate, 'ga:sessions', ['dimensions' => 'ga:country', 'sort' => '-ga:sessions']);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
+
+        foreach ($answer->rows as $dateRow) {
+            $CountryData [] = ['country'=>$dateRow[0], 'sessions' => $dateRow[1]];
+        }
+
+        return new Collection($CountryData);
+    }
+
+
+
+    /**
+     * Get the past visitors location iso code.
+     *
+     * @param int    $numberOfDays
+     * @param string $groupBy      Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getCountryIso($numberOfDays = 365, $groupBy = 'date')
+    {
+        list($startDate, $endDate) = $this->calculateNumberOfDays($numberOfDays);
+
+        return $this->getCountryIsoForPeriod($startDate, $endDate, $groupBy);
+    }
+
+
+    /**
+     * Get the country Iso session for the given period.
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string   $groupBy   Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getCountryIsoForPeriod(DateTime $startDate, DateTime $endDate, $groupBy = 'date')
+    {
+        $CountryData = [];
+        $answer = $this->performQuery($startDate, $endDate, 'ga:sessions', ['dimensions' => 'ga:countryIsoCode' ,'sort' => '-ga:sessions']);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
+
+        foreach ($answer->rows as $dateRow) {
+            $CountryData [] = ['countryIso'=>$dateRow[0], 'sessions' => $dateRow[1]];
+        }
+
+        return new Collection($CountryData);
+    }
+
+
+    /**
+     * Get the past visitors.
+     *
+     * @param int    $numberOfDays
+     * @param string $groupBy      Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getUsers($numberOfDays = 365, $groupBy = 'date')
+    {
+        list($startDate, $endDate) = $this->calculateNumberOfDays($numberOfDays);
+
+        return $this->getUsersForPeriod($startDate, $endDate, $groupBy);
+    }
+
+
+    /**
+     * Get the past visitors for the given period.
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string   $groupBy   Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getUsersForPeriod(DateTime $startDate, DateTime $endDate, $groupBy = 'date')
+    {
+        $UserData = [];
+        $answer = $this->performQuery($startDate, $endDate, 'ga:users', ['dimensions' => 'ga:'.$groupBy]);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
+
+        foreach ($answer->rows as $dateRow) {
+            $UserData [] = [$groupBy => Carbon::createFromFormat(($groupBy == 'yearMonth' ? 'Ym' : 'Ymd'), $dateRow[0]), 'users' => $dateRow[1]];
+        }
+
+        return new Collection($UserData);
+    }
+
+
+
+    /**
+     * Get the New visitors.
+     *
+     * @param int    $numberOfDays
+     * @param string $groupBy      Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getNewUsers($numberOfDays = 365, $groupBy = 'date')
+    {
+        list($startDate, $endDate) = $this->calculateNumberOfDays($numberOfDays);
+
+        return $this->getNewUsersForPeriod($startDate, $endDate, $groupBy);
+    }
+
+
+    /**
+     * Get the New visitors for the given period.
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string   $groupBy   Possible values: date, yearMonth
+     *
+     * @return Collection
+     */
+
+    public function getNewUsersForPeriod(DateTime $startDate, DateTime $endDate, $groupBy = 'date')
+    {
+        $UserData = [];
+        $answer = $this->performQuery($startDate, $endDate, 'ga:users', ['dimensions' => 'ga:'.$groupBy]);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
+
+        foreach ($answer->rows as $dateRow) {
+            $UserData [] = [$groupBy => Carbon::createFromFormat(($groupBy == 'yearMonth' ? 'Ym' : 'Ymd'), $dateRow[0]), 'users' => $dateRow[1]];
+        }
+
+        return new Collection($UserData);
+    }
+
+    
+    
 }
